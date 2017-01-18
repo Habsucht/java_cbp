@@ -47,8 +47,8 @@ public class Control implements Service {
         // Настраиваем потоки
         BufferedReader from_client = new BufferedReader(new InputStreamReader(inputStream));
         PrintWriter to_client = new PrintWriter(outputStream, true);
-        String lineBuffer;                // Для чтения строк из клиентского ввода
-        boolean authorized = false; // Пользователь уже сказал пароль?
+        String lineBuffer;                  // Для чтения строк из клиентского ввода
+        boolean authorized = false;         // Пользователь уже сказал пароль?
 
         // Если к этой службе уже подключен клиент, отображаем сообщение для этого клиента и закрываем
         // подключение. Мы используем синхронизированный блок для предотвращения “состояния гонки”.

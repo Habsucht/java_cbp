@@ -9,11 +9,9 @@ import java.util.Base64;
 public class SMTP implements Service {
 
     public void serve(InputStream inputStream, OutputStream outputStream) throws IOException {
-        // Получаем потоки ввода и вывода для разговора с клиентом
         BufferedReader from_client = new BufferedReader(new InputStreamReader(inputStream));
         PrintWriter to_client = new PrintWriter(outputStream, true);
 
-        // Параметр true передается для осуществления автоматического проталкивания в методе println()
         PrintWriter to_console = new PrintWriter(System.out, true);
 
         String lineBuffer;
@@ -27,7 +25,7 @@ public class SMTP implements Service {
         to_console.println(">> 220 localhost ESMTP SubEthaSMTP null");
 
         while (true) {
-            to_console.println("--------------------------------\n *** Счётчик цикла - " + ++retryCount + " ***");
+            to_console.println("--------------------------------\n *** Counter - " + ++retryCount + " ***");
 
             lineBuffer = from_client.readLine();
             to_console.println("<< " + lineBuffer + "\n--------------------------------");
@@ -35,8 +33,8 @@ public class SMTP implements Service {
             if (errorCount > 5) break;
 
             if (!data) {
-                if (lineBuffer.substring(0, 4).toUpperCase().equals("EHLO")) {
-                    to_console.println("S: Получено приветствие от клиента: " + lineBuffer);
+                if (lineBuffer.substring(0, 4).toUpperCase().equals("EHLO") || lineBuffer.substring(0, 4).toUpperCase().equals("HELO")) {
+                    to_console.println("S: Message received from the client: " + lineBuffer);
 
                     to_client.println("250-localhost Hello client.server.net");
                     to_client.println("250 DSN");
@@ -45,24 +43,24 @@ public class SMTP implements Service {
                             ">> 250 DSN\n");
 
                 } else if (lineBuffer.substring(0, 4).toUpperCase().equals("MAIL")) {
-                    to_console.println("S: Получено сообщение от клиента: " + lineBuffer);
+                    to_console.println("S: Message received from the client: " + lineBuffer);
                     to_client.println("250 2.1.0 Ok");
                     to_console.println(">> 250 2.1.0 Ok");
 
                 } else if (lineBuffer.substring(0, 4).toUpperCase().equals("RCPT")) {
-                    to_console.println("S: Получено сообщение от клиента: " + lineBuffer);
+                    to_console.println("S: Message received from the client: " + lineBuffer);
                     to_client.println("250 2.1.5 Ok");
                     to_console.println(">> 250 2.1.5 Ok");
 
                 } else if (lineBuffer.substring(0, 4).toUpperCase().equals("DATA")) {
-                    to_console.println("S: Получено сообщение от клиента: " + lineBuffer);
+                    to_console.println("S: Message received from the client: " + lineBuffer);
                     to_client.println("354 End data with <CR><LF>.<CR><LF>");
                     to_console.println(">> 354 End data with <CR><LF>.<CR><LF>");
                     data = true;
 
                 } else {
                     ++errorCount;
-                    to_console.println("S: ОШИБКА! Неизвестная команда: " + lineBuffer);
+                    to_console.println("S: ERROR! Unknown command: " + lineBuffer);
                     to_client.println("Unknown command.");
                     to_console.println(">> POST: Unknown command. " + errorCount);
                 }
